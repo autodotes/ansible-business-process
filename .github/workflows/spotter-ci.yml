@@ -1,5 +1,6 @@
 name: CI/CD workflow for Steampunk Spotter
-on: [push]
+on:
+  workflow_dispatch:
 jobs:
   run:
     runs-on: ubuntu-latest

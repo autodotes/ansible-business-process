@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-09 — Tune CI secret scan and Spotter triggers
+
+### Changed
+- Gitleaks workflow now uses the org `GITLEAKS_LICENSE` secret.
+- Spotter CI runs only on manual `workflow_dispatch` instead of every push;
+  README CI note updated accordingly.
+
 ## 2026-11-09 — Publish local collections to Ansible Galaxy
 
 ### Added

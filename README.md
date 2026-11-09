@@ -107,7 +107,7 @@ back the workflows above:
 - **CI**: [`.github/workflows/validate.yml`](.github/workflows/validate.yml) runs `ansible-lint`,
   a playbook syntax check, and a Markdown spell check on every push/PR;
   [`gitleaks.yml`](.github/workflows/gitleaks.yml) scans for committed secrets;
-  [`spotter-ci.yml`](.github/workflows/spotter-ci.yml) runs Steampunk Spotter analysis;
+  [`spotter-ci.yml`](.github/workflows/spotter-ci.yml) is a manual Steampunk Spotter scan;
   [`publish.yml`](.github/workflows/publish.yml) tags and publishes `zjleblanc.gsuite` /
   `zjleblanc.rh_case_mgmt` to Ansible Galaxy when those collection trees change (or via
   manual dispatch), using independent tags ending in `-gsuite` / `-rh-case-mgmt`;
