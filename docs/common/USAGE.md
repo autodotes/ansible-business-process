@@ -314,16 +314,28 @@ support_case_accounts:
     ids: ['789012', '345678']
 
 # Not sourced from any credential type — set directly here:
-tracker_email_to:
-  - team@example.com
-  - oncall@example.com
+tracker_notifications:
+  - to:
+      - team@example.com
+      - oncall@example.com
+    accounts: all
+  - to:
+      - terr5@example.com
+    accounts:
+      - Parasol
 tracker_smtp_secure: starttls          # try | always | never | starttls
 # tracker_notify_on_no_changes: true   # optional: always send, even without changes
+# Legacy alternative (omit tracker_notifications): one email to tracker_email_to for all accounts
+# tracker_email_to:
+#   - team@example.com
 ```
 
 Add a **Schedule** for a cadence (e.g. every 4 hours) — this is the playbook's primary run mode.
-The email is only sent when at least one tracked account has a new, closed, or updated case,
-unless `tracker_notify_on_no_changes: true`.
+Use one schedule with the full `support_case_accounts` pull list and multiple
+`tracker_notifications` pairings when different recipient groups need different account scopes;
+avoid overlapping schedules that rewrite the same tracker tab. Each pairing is emailed only when
+its scoped accounts have a new, closed, or updated case, unless
+`tracker_notify_on_no_changes: true`.
 
 Deploy both templates (and their credential instances from step 6) with:
 
@@ -350,7 +362,8 @@ Both job templates write to the **same spreadsheet** (`google_sheet_id`) but dif
    and the `Accounts` tab's update column is populated for each configured account.
 2. Launch **BPA // Support Case Tracker** manually. Confirm the `Support Case Tracker` tab is
    populated, and — since every case is "new" on the very first run — that a
-   change-notification email arrives at the `tracker_email_to` addresses.
+   change-notification email arrives for each `tracker_notifications` pairing (or the legacy
+   `tracker_email_to` addresses).
 3. Run **BPA // Support Case Tracker** a second time with no case changes upstream; confirm no
    email is sent (unless `tracker_notify_on_no_changes: true`).
 4. Confirm the schedules on both job templates are enabled for ongoing, unattended runs.
@@ -364,7 +377,7 @@ Both job templates write to the **same spreadsheet** (`google_sheet_id`) but dif
 | `community.general.mail` module not found | `community.general` isn't installed in the EE — confirm it's in [collections/requirements.yml](../../collections/requirements.yml) and rebuild the EE |
 | `403` / permission errors from Google Sheets | The spreadsheet isn't shared with the service account email (Editor) — see step 2 |
 | `lookup_value not found in column K` | A row's lookup column value doesn't match the account `name` / `gsheet_lookup_value` in the `Accounts` tab — see step 9 |
-| Tracker email never arrives | Check both Credentials are attached to the `pb_track_support_cases.yml` job template, and that `tracker_email_to` is set in Variables — the playbook's precondition `assert` task fails fast with a descriptive message if anything required is missing |
+| Tracker email never arrives | Check both Credentials are attached to the `pb_track_support_cases.yml` job template, and that `tracker_notifications` (or legacy `tracker_email_to`) is set in Variables — the playbook's precondition `assert` task fails fast with a descriptive message if anything required is missing |
 | SMTP auth error (`535`, `Username and Password not accepted`) | Using the Google account password instead of an App Password — see step 3, Option A |
 | `pandoc: ~/.pandoc/github-md.css: No such file or directory` | Only occurs if a job template adds the `pdf` tag — see the caveat at the end of step 7 |
 

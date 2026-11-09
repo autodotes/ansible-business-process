@@ -19,11 +19,13 @@
           - email_smtp_server | length > 0
           - email_smtp_from_address is defined
           - email_smtp_from_address | length > 0
-          - tracker_email_to is defined # e.g. ["team@example.com"]
-          - tracker_email_to | length > 0
+          - >-
+            (tracker_notifications is defined and tracker_notifications | length > 0)
+            or (tracker_email_to is defined and tracker_email_to | length > 0)
         fail_msg: >-
           Required extra vars missing: redhat_offline_token, gsheet_id, email_smtp_server,
-          email_smtp_from_address, tracker_email_to. Provide them via -e @vault.yml or other extra vars.
+          email_smtp_from_address, and either tracker_notifications or tracker_email_to.
+          Provide them via -e @vault.yml or other extra vars.
         quiet: true
 
     - name: Build account list from legacy single-account variables
@@ -44,6 +46,70 @@
           No accounts configured. Provide support_case_accounts (list of name/ids dicts) or
           support_case_account_name + support_case_account_ids for a single account.
         success_msg: "Tracking {{ support_case_accounts | length }} account configuration(s)"
+
+    - name: Normalize notification pairings from legacy tracker_email_to
+      when: tracker_notifications is not defined
+      ansible.builtin.assert:
+        that:
+          - tracker_email_to is defined
+          - tracker_email_to is sequence
+          - tracker_email_to is not string
+          - tracker_email_to | length > 0
+        fail_msg: >-
+          tracker_email_to must be a non-empty list when tracker_notifications is omitted.
+        quiet: true
+
+    - name: Build notification pairings from legacy tracker_email_to
+      when: tracker_notifications is not defined
+      ansible.builtin.set_fact:
+        tracker_notifications:
+          - to: "{{ tracker_email_to }}"
+            accounts: all
+
+    - name: Validate notification pairings list
+      ansible.builtin.assert:
+        that:
+          - tracker_notifications is defined
+          - tracker_notifications is sequence
+          - tracker_notifications is not string
+          - tracker_notifications | length > 0
+        fail_msg: >-
+          Provide tracker_notifications (non-empty list of to/accounts pairings) or
+          tracker_email_to (non-empty list) for a single all-accounts notification.
+        success_msg: "Configured {{ tracker_notifications | length }} notification pairing(s)"
+
+    - name: Validate each notification pairing
+      vars:
+        _to: "{{ notification.to | default([]) }}"
+        _accounts: "{{ notification.accounts | default('') }}"
+        _pull_names: "{{ support_case_accounts | map(attribute='name') | list }}"
+        _unknown: >-
+          {{
+            [] if (_accounts == 'all')
+            else (
+              (_accounts | difference(_pull_names))
+              if (_accounts is sequence and _accounts is not string)
+              else ['<accounts must be all or a list>']
+            )
+          }}
+      ansible.builtin.assert:
+        that:
+          - _to is sequence
+          - _to is not string
+          - _to | length > 0
+          - >-
+            (_accounts == 'all')
+            or (_accounts is sequence and _accounts is not string and (_accounts | length > 0))
+          - _unknown | length == 0
+        fail_msg: >-
+          Invalid tracker_notifications pairing {{ notification }}:
+          'to' must be a non-empty list;
+          'accounts' must be 'all' or a non-empty list of names from support_case_accounts;
+          unknown or invalid account names: {{ _unknown }}.
+      loop: "{{ tracker_notifications }}"
+      loop_control:
+        loop_var: notification
+        label: "{{ notification.to | default(['?']) | join(',') }}"
 
     - name: Exchange offline token for access token via Red Hat SSO
       ansible.builtin.uri:
@@ -96,12 +162,23 @@
         rows: "{{ tracker_final_rows }}"
       register: r_tracker_write
 
-    - name: Determine whether any account has changes
-      ansible.builtin.set_fact:
-        tracking_has_any_changes: "{{ tracking_results | selectattr('has_changes') | list | length > 0 }}"
-
     - name: Send change notification email
-      when: tracking_has_any_changes or tracker_notify_on_no_changes
+      vars:
+        notification_results: >-
+          {{
+            tracking_results
+            if (notification.accounts == 'all')
+            else (tracking_results | selectattr('account', 'in', notification.accounts) | list)
+          }}
+      when: >-
+        tracker_notify_on_no_changes
+        or (
+          (
+            tracking_results
+            if (notification.accounts == 'all')
+            else (tracking_results | selectattr('account', 'in', notification.accounts) | list)
+          ) | selectattr('has_changes') | list | length > 0
+        )
       community.general.mail:
         host: "{{ email_smtp_server }}"
         port: "{{ email_smtp_server_port | default(omit) }}"
@@ -109,11 +186,26 @@
         password: "{{ email_smtp_password | default(omit) }}"
         secure: "{{ tracker_smtp_secure | default(omit) }}"
         from: "{{ email_smtp_from_address }}"
-        to: "{{ tracker_email_to }}"
+        to: "{{ notification.to }}"
         subject: >-
-          {{ tracker_email_subject }}{{ '' if tracking_has_any_changes else ' (no changes)' }}
+          {{ tracker_email_subject }}{{
+            ''
+            if (
+              (
+                tracking_results
+                if (notification.accounts == 'all')
+                else (tracking_results | selectattr('account', 'in', notification.accounts) | list)
+              ) | selectattr('has_changes') | list | length > 0
+            )
+            else ' (no changes)'
+          }}
         subtype: html
         body: "{{ lookup('template', '../templates/support_case_tracking_email.html.j2') }}"
+      loop: "{{ tracker_notifications }}"
+      loop_control:
+        loop_var: notification
+        label: "{{ notification.to | join(',') }}"
+      register: r_tracker_notifications
       no_log: "{{ secure_logging }}"
 
     - name: Display tracking run summary
@@ -124,5 +216,9 @@
           - "============================================"
           - "Accounts Tracked: {{ tracking_results | length }}"
           - "Accounts With Changes: {{ tracking_results | selectattr('has_changes') | list | length }}"
-          - "Notification Sent: {{ tracking_has_any_changes or tracker_notify_on_no_changes }}"
+          - >-
+            Notifications Sent:
+            {{ r_tracker_notifications.results | json_query('[?!skipped]') | length }}
+            /
+            {{ tracker_notifications | length }}
           - "============================================"

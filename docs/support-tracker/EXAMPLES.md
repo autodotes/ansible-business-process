@@ -26,7 +26,9 @@ credential setup shared by both workflows.
    configuration. Treat it as its own green-field tab (default name: `Support Case Tracker`).
    The same step also creates/resizes a Sheets API Table over the tab, named `gsheet_table_name`
    (defaults to the sheet name).
-5. Emails a summary of the diff via `community.general.mail` — only when something changed,
+5. Emails one or more change summaries via `community.general.mail`, one message per
+   `tracker_notifications` pairing. Each pairing scopes the body to `accounts: all` or a named
+   subset of the pulled accounts. A pairing is sent only when its scoped accounts have changes,
    unless `tracker_notify_on_no_changes: true`.
 
 The date cutoff is resolved in order: `tracker_last_run_date` (manual override via `-e`) → sheet
@@ -75,24 +77,47 @@ gsheet_id: "your-spreadsheet-id"
 # gsheet_sheet: "Support Case Tracker"
 ```
 
-SMTP settings and the recipient list are plain extra vars — pass them with `-e` or add them to
-`vault.yml`:
+SMTP settings and notification recipients are plain extra vars — pass them with `-e` or add them
+to `vault.yml`. Prefer `tracker_notifications` when different recipient groups should see
+different account scopes from a single run:
+
+```yaml
+# my_notifications.yml
+tracker_notifications:
+  - to:
+      - team@example.com
+      - oncall@example.com
+    accounts: all
+  - to:
+      - region-team@example.com
+    accounts:
+      - Parasol
+      - Acme Corp
+```
 
 ```bash
 ansible-navigator run playbooks/pb_track_support_cases.yml \
-  -e @vault.yml -e @my_accounts.yml \
+  -e @vault.yml -e @my_accounts.yml -e @my_notifications.yml \
   -e email_smtp_server="smtp.example.com" \
   -e email_smtp_server_port="587" \
   -e email_smtp_username="notifier@example.com" \
   -e email_smtp_password="..." \
   -e email_smtp_from_address="support-tracker@example.com" \
-  -e tracker_smtp_secure="starttls" \
-  -e tracker_email_to='["team@example.com","oncall@example.com"]'
+  -e tracker_smtp_secure="starttls"
 ```
 
-`tracker_smtp_secure` (optional: `try`|`always`|`never`|`starttls`) and `tracker_email_to` are
-plain playbook variables — they are **not** sourced from any credential type, so set them with
-`-e` or as extra vars on the job template either way.
+Each pairing requires a non-empty `to` list. `accounts` must be the string `all` (every account
+pulled in this run) or a non-empty list of names that match `support_case_accounts[].name`.
+Accounts still get fetched and written even when no pairing names them; they appear in email
+only via an `all` pairing.
+
+Legacy single-recipient mode still works: omit `tracker_notifications` and set
+`tracker_email_to` to a non-empty list. The playbook builds one pairing with `accounts: all`.
+If both are set, `tracker_notifications` is used.
+
+`tracker_smtp_secure` (optional: `try`|`always`|`never`|`starttls`), `tracker_notifications`,
+and `tracker_email_to` are plain playbook variables — they are **not** sourced from any
+credential type, so set them with `-e` or as extra vars on the job template either way.
 
 ## Run once
 
@@ -150,9 +175,9 @@ has three states, called in this order once per run:
 - **`state: diff`** (once per account, no API calls) — returns `new_cases`, `closed_cases`,
   `updated_cases` (with before/after values for severity, status, and owner), `total_current` /
   `total_previous` counts, and `rows` (that account's freshly-built replacement rows to
-  accumulate). These drive both the email template
-  ([templates/support_case_tracking_email.html.j2](../../templates/support_case_tracking_email.html.j2))
-  and the per-account debug summary printed during the run.
+  accumulate). These drive the per-account debug summary and are filtered into
+  `notification_results` for each email pairing
+  ([templates/support_case_tracking_email.html.j2](../../templates/support_case_tracking_email.html.j2)).
 - **`state: write`** (once, after the account loop) — takes the fully assembled `rows` (every
   account's accumulated rows, concatenated with `other_rows`) and performs the single
   clear+rewrite, plus best-effort Table maintenance (`table_name`).

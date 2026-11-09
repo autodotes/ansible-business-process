@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-11-09 — Scope tracker emails with notification pairings
+
+### Added
+- `tracker_notifications` on `playbooks/pb_track_support_cases.yml`: a list of `{to, accounts}`
+  pairings so one run can email different recipient lists scoped to `all` pulled accounts or a
+  named subset, after a single Google Sheet read/write.
+
+### Changed
+- Tracker email sending now loops pairings after the sheet write; each message uses a scoped
+  `notification_results` slice in `templates/support_case_tracking_email.html.j2`.
+- Legacy `tracker_email_to` still works when `tracker_notifications` is omitted (one pairing with
+  `accounts: all`). Both `to` and `support_case_accounts` must be non-empty lists.
+- Docs updated in `docs/support-tracker/EXAMPLES.md`, `docs/support-tracker/DATA_FLOW.md`, and
+  `docs/common/USAGE.md`.
+
 ## 2026-10-12 — Add Sheets-friendly date format defaults for support tracker vars
 
 ### Changed

@@ -26,6 +26,8 @@ gsheet_table_name: "{{ gsheet_sheet }}"
 tracker_status_filter: { ne: "Closed" }
 
 # Notification subject and send conditions.
+# Recipients: set tracker_notifications (list of {to, accounts} pairings) or legacy
+# tracker_email_to (non-empty list → one pairing with accounts: all). Both are extra vars.
 tracker_email_subject: "Support Case Tracker - Changes Detected"
 tracker_notify_on_no_changes: false
 

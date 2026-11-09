@@ -1,9 +1,11 @@
-{# HTML email body for playbooks/pb_track_support_cases.yml — relies on `tracking_results` #}
-{# (list of per-account diff dicts set by tasks/account_track.yml) and the                #}
-{# `tracking_has_any_changes` flag set by pb_track_support_cases.yml.                      #}
-{%- set total_new_count = tracking_results | map(attribute='new_cases') | map('length') | sum -%}
-{%- set total_closed_count = tracking_results | map(attribute='closed_cases') | map('length') | sum -%}
-{%- set total_updated_count = tracking_results | map(attribute='updated_cases') | map('length') | sum -%}
+{# HTML email body for playbooks/pb_track_support_cases.yml — relies on          #}
+{# `notification_results` (scoped per pairing; falls back to `tracking_results`) #}
+{# set by the mail task in pb_track_support_cases.yml.                           #}
+{%- set email_results = notification_results | default(tracking_results) -%}
+{%- set email_has_changes = (email_results | selectattr('has_changes') | list | length > 0) -%}
+{%- set total_new_count = email_results | map(attribute='new_cases') | map('length') | sum -%}
+{%- set total_closed_count = email_results | map(attribute='closed_cases') | map('length') | sum -%}
+{%- set total_updated_count = email_results | map(attribute='updated_cases') | map('length') | sum -%}
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,9 +18,9 @@
   <h1 style="font-size: 20px; margin: 0 0 4px;">Support Case Tracker</h1>
   <p style="color: #666; margin: 0 0 16px;">Run completed {{ now(utc=True, fmt='%Y-%m-%d %H:%M UTC') }}</p>
 
-  {% if not tracking_has_any_changes %}
+  {% if not email_has_changes %}
   <p style="background:#f0f7ff; border:1px solid #cfe3fc; padding:12px; border-radius:4px; color:#1a4480;">
-    No changes detected across any tracked account since the last run.
+    No changes detected across the accounts in this notification since the last run.
   </p>
   {% endif %}
 
@@ -27,17 +29,17 @@
       <th style="padding:8px; border-bottom:2px solid #ddd;">New</th>
       <th style="padding:8px; border-bottom:2px solid #ddd;">Closed</th>
       <th style="padding:8px; border-bottom:2px solid #ddd;">Updated</th>
-      <th style="padding:8px; border-bottom:2px solid #ddd;">Accounts Tracked</th>
+      <th style="padding:8px; border-bottom:2px solid #ddd;">Accounts In Scope</th>
     </tr>
     <tr>
       <td style="padding:8px;">{{ total_new_count }}</td>
       <td style="padding:8px;">{{ total_closed_count }}</td>
       <td style="padding:8px;">{{ total_updated_count }}</td>
-      <td style="padding:8px;">{{ tracking_results | length }}</td>
+      <td style="padding:8px;">{{ email_results | length }}</td>
     </tr>
   </table>
 
-  {% for result in tracking_results %}
+  {% for result in email_results %}
   <div style="margin-top:28px; border-top: 2px solid #e0e0e0; padding-top: 16px;">
     <h2 style="font-size:16px; margin:0 0 4px;">{{ result.account }}</h2>
     <p style="color:#666; margin:0 0 12px;">

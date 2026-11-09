@@ -9,6 +9,7 @@ sequenceDiagram
   participant SSO as RedHatSSO
   participant GQL as GraphQLAPI
   participant Sheet as GoogleSheet
+  participant Mail
 
   Playbook->>SSO: Exchange offline token
   SSO-->>Playbook: Bearer token
@@ -21,6 +22,9 @@ sequenceDiagram
     Playbook->>Playbook: "gsheet_tracker state=diff (no API call)"
   end
   Playbook->>Sheet: "gsheet_tracker state=write (once)"
+  loop per tracker_notifications pairing
+    Playbook->>Mail: email scoped to all or named accounts
+  end
 ```
 
 ## Flow
@@ -45,9 +49,12 @@ sequenceDiagram
 5. **Write once** — after every account has been processed, `state: write` writes `other_rows` +
    every account's accumulated rows in a single clear+rewrite, and maintains a Sheets API Table
    (`gsheet_table_name`, defaults to `gsheet_sheet`) over the result.
-6. **Email notification** — `community.general.mail` sends a change summary (rendered from
+6. **Email notifications** — after the single sheet write, the playbook loops
+   `tracker_notifications` (or a legacy one-pairing fallback from `tracker_email_to`). Each
+   pairing sends one `community.general.mail` message (rendered from
    [templates/support_case_tracking_email.html.j2](../../templates/support_case_tracking_email.html.j2))
-   if any account has diffs (or always, when `tracker_notify_on_no_changes: true`).
+   scoped to `accounts: all` or a named subset. A pairing is sent when its scoped accounts have
+   diffs (or always, when `tracker_notify_on_no_changes: true`).
 
 See [../support-analyzer/DATA_FLOW.md](../support-analyzer/DATA_FLOW.md) for the analyzer
 workflow's data flow (which shares the SSO step but writes to a different Google Sheet tab and
