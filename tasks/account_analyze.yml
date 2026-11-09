@@ -24,7 +24,7 @@
             utc=true
           )
       }}
-  business.support.graphql_cases:
+  zjleblanc.rh_case_mgmt.graphql_cases:
     access_token: "{{ redhat_access_token }}"
     graphql_url: "{{ redhat_graphql_url }}"
     client_name: "{{ redhat_graphql_client_name }}"
@@ -91,7 +91,7 @@
       {{ ('pdf' in ansible_skip_tags) | ternary(
         'Respond in vanilla html. No markdown. No newlines and dashes, use html tags for formatting.',
         omit) }}
-  business.support.llm_summarize:
+  zjleblanc.rh_case_mgmt.llm_summarize:
     api_key: "{{ llm_api_key }}"
     api_base_url: "{{ llm_api_base_url }}"
     case_data: "{{ llm_case_data }}"
@@ -133,7 +133,7 @@
   tags: [ai, pdf, never]
 
 - name: Update Google Sheet | {{ account.name }}
-  business.support.gsheet_update:
+  zjleblanc.rh_case_mgmt.gsheet_update:
     gsheet_id: "{{ gsheet_id | default(omit) }}"
     credentials_path: "{{ google_credentials_path | default(omit) }}"
     credentials: "{{ google_credentials | default(omit) }}"

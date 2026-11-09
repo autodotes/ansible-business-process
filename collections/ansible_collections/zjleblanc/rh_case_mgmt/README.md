@@ -1,4 +1,4 @@
-# business.support
+# zjleblanc.rh_case_mgmt
 
 Ansible collection for fetching, summarizing, and tracking Red Hat support cases. Backs the
 support-analyzer and support-tracker workflows (see
@@ -25,12 +25,12 @@ support-analyzer and support-tracker workflows (see
   computation that returns new/closed/updated cases; `write` performs the single clear+rewrite and
   optionally maintains a Sheets API "Table" object over the tab.
 
-### Note on the separate `business.google.gsheet_update`
+### Note on the separate `zjleblanc.gsuite.gsheet_update`
 
 This collection's `gsheet_update` is intentionally distinct from
-[`business.google.gsheet_update`](../google/README.md). They diverged from different lineages:
+[`zjleblanc.gsuite.gsheet_update`](../gsuite/README.md). They diverged from different lineages:
 
-| | `business.support.gsheet_update` | `business.google.gsheet_update` |
+| | `zjleblanc.rh_case_mgmt.gsheet_update` | `zjleblanc.gsuite.gsheet_update` |
 |---|---|---|
 | Auth | Service account only | Service account or OAuth2 installed-app |
 | Writes | Single cell per call | Single cell, or batch `updates` (multiple columns/cells per call) |

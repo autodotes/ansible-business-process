@@ -11,8 +11,8 @@ DOCUMENTATION = r'''
     short_description: Match parsed Salesforce report accounts to Google Sheet rows by Salesforce record ID
     version_added: "1.2.0"
     description:
-        - Correlates the C(accounts) list produced by the M(business.google.parse_sf_tasks) filter to rows read
-          from a Google Sheet (via M(business.google.gsheet_read)) using the Salesforce record ID embedded in each
+        - Correlates the C(accounts) list produced by the M(zjleblanc.gsuite.parse_sf_tasks) filter to rows read
+          from a Google Sheet (via M(zjleblanc.gsuite.gsheet_read)) using the Salesforce record ID embedded in each
           account's Salesforce URL.
         - Salesforce URLs for the same record can differ in shape between contexts (e.g. a report export vs. a
           manually inserted spreadsheet link), such as C(.../r/0016e00.../view) vs. C(.../r/Account/0016e00.../view).
@@ -24,21 +24,21 @@ DOCUMENTATION = r'''
     positional: _input
     options:
         _input:
-            description: The C(accounts) list from M(business.google.parse_sf_tasks)'s output (C(sf_report.accounts)).
+            description: The C(accounts) list from M(zjleblanc.gsuite.parse_sf_tasks)'s output (C(sf_report.accounts)).
             type: list
             elements: dict
             required: true
         gsheet_values:
             description: >-
                 Row-major account name values read from the Google Sheet's account column, as returned by
-                M(business.google.gsheet_read) (its C(values) return value).
+                M(zjleblanc.gsuite.gsheet_read) (its C(values) return value).
             type: list
             elements: list
             required: true
         gsheet_hyperlinks:
             description: >-
                 Row-major hyperlink URLs read from the Google Sheet's account column, aligned with O(gsheet_values),
-                as returned by M(business.google.gsheet_read) (its C(hyperlinks) return value).
+                as returned by M(zjleblanc.gsuite.gsheet_read) (its C(hyperlinks) return value).
             type: list
             elements: list
             required: true
@@ -49,10 +49,10 @@ EXAMPLES = r'''
   ansible.builtin.set_fact:
     matched_accounts: >-
       {{ sf_report.accounts
-         | business.google.match_sf_accounts(gsheet_accounts.values, gsheet_accounts.hyperlinks) }}
+         | zjleblanc.gsuite.match_sf_accounts(gsheet_accounts.values, gsheet_accounts.hyperlinks) }}
 
 - name: Update each matched account's row
-  business.google.gsheet_update:
+  zjleblanc.gsuite.gsheet_update:
     sheet: Data
     lookup_column: A
     lookup_value: "{{ item.lookup_value }}"
@@ -73,7 +73,7 @@ _value:
         lookup_value:
             description: >-
                 The account's exact text value as it appears in the Google Sheet's account column -- use this
-                (not O(account)) as C(lookup_value) when calling M(business.google.gsheet_update), since it is
+                (not O(account)) as C(lookup_value) when calling M(zjleblanc.gsuite.gsheet_update), since it is
                 guaranteed to match the cell text exactly.
             type: str
         account:

@@ -119,7 +119,7 @@ options:
 
 EXAMPLES = r'''
 - name: Update case count for a customer row (uses GOOGLE_SA_CRED_PATH and GOOGLE_SHEET_ID)
-  business.google.gsheet_update:
+  zjleblanc.gsuite.gsheet_update:
     sheet: Customers
     lookup_column: A
     lookup_value: "{{ support_case_account_name }}"
@@ -127,7 +127,7 @@ EXAMPLES = r'''
     update_value: "{{ all_cases | length }}"
 
 - name: Update with explicit credentials path
-  business.google.gsheet_update:
+  zjleblanc.gsuite.gsheet_update:
     credentials_path: /path/to/service-account.json
     gsheet_id: "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
     lookup_column: B
@@ -137,7 +137,7 @@ EXAMPLES = r'''
   register: gsheet_result
 
 - name: Update using explicit OAuth2 credentials instead of a service account
-  business.google.gsheet_update:
+  zjleblanc.gsuite.gsheet_update:
     client_id: "{{ google_client_id }}"
     client_secret: "{{ google_client_secret }}"
     refresh_token: "{{ google_refresh_token }}"
@@ -149,7 +149,7 @@ EXAMPLES = r'''
     update_value: "{{ all_cases | length }}"
 
 - name: Write several columns on one account row in a single API call
-  business.google.gsheet_update:
+  zjleblanc.gsuite.gsheet_update:
     sheet: Data
     lookup_column: A
     lookup_value: "{{ account.name }}"
@@ -167,7 +167,7 @@ EXAMPLES = r'''
     loop_var: account
 
 - name: Write totals directly by cell reference, no lookup needed
-  business.google.gsheet_update:
+  zjleblanc.gsuite.gsheet_update:
     sheet: Data
     updates:
       - cell: D17
@@ -207,7 +207,7 @@ spreadsheet_id:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.business.google.plugins.module_utils.auth import (
+from ansible_collections.zjleblanc.gsuite.plugins.module_utils.auth import (
     GOOGLE_CLIENT_ID_ENV,
     GOOGLE_CLIENT_SECRET_ENV,
     GOOGLE_REFRESH_TOKEN_ENV,
@@ -223,7 +223,7 @@ from ansible_collections.business.google.plugins.module_utils.auth import (
     resolve_gsheet_id,
     resolve_oauth_param,
 )
-from ansible_collections.business.google.plugins.module_utils.gsheets import (
+from ansible_collections.zjleblanc.gsuite.plugins.module_utils.gsheets import (
     cell_range,
     column_range,
     coerce_cell_value,

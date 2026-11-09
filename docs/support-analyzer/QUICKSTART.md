@@ -130,7 +130,7 @@ Make sure `vault.yml` (or your extra vars) supplies `redhat_offline_token`, `llm
 - Customize the report template at
   [templates/support_case_analysis.md.j2](../../templates/support_case_analysis.md.j2)
 - Adjust AI prompts in
-  [collections/ansible_collections/business/support/plugins/modules/llm_summarize.py](../../collections/ansible_collections/business/support/plugins/modules/llm_summarize.py)
+  [collections/ansible_collections/zjleblanc/rh_case_mgmt/plugins/modules/llm_summarize.py](../../collections/ansible_collections/zjleblanc/rh_case_mgmt/plugins/modules/llm_summarize.py)
 - Set up automated reports with an AAP schedule (see [../common/USAGE.md](../common/USAGE.md))
 
 ## Getting API keys

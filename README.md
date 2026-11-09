@@ -34,13 +34,13 @@ This repo follows the conventions in [AGENTS.md](AGENTS.md) and the
 
 ### Collections
 
-Local collections under [`collections/ansible_collections/business/`](collections/ansible_collections/business/)
+Local collections under [`collections/ansible_collections/zjleblanc/`](collections/ansible_collections/zjleblanc/)
 back the workflows above:
 
 | Collection | Purpose |
 |---|---|
-| [`business.google`](collections/ansible_collections/business/google/README.md) | Gmail search, Google Sheets read/update, Salesforce-activity-email parsing filters |
-| [`business.support`](collections/ansible_collections/business/support/README.md) | Red Hat GraphQL case fetch, OpenAI-compatible LLM summarization, Sheets-backed case tracking |
+| [`zjleblanc.gsuite`](collections/ansible_collections/zjleblanc/gsuite/README.md) | Gmail search, Google Sheets read/update, Salesforce-activity-email parsing filters |
+| [`zjleblanc.rh_case_mgmt`](collections/ansible_collections/zjleblanc/rh_case_mgmt/README.md) | Red Hat GraphQL case fetch, OpenAI-compatible LLM summarization, Sheets-backed case tracking |
 
 ### Automation content
 

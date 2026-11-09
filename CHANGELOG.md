@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-11-09 — Rename local collections
+
+### Changed
+- Renamed `business.google` to `zjleblanc.gsuite`
+  (`collections/ansible_collections/zjleblanc/gsuite`).
+- Renamed `business.support` to `zjleblanc.rh_case_mgmt`
+  (`collections/ansible_collections/zjleblanc/rh_case_mgmt`).
+- Updated playbooks, tasks, docs, credential-type descriptions, and fully qualified
+  module and filter names to the new collections.
+
 ## 2026-11-09 — Scope tracker emails with notification pairings
 
 ### Added

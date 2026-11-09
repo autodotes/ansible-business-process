@@ -3,7 +3,7 @@
 # Copyright: (c) 2026, Zachary LeBlanc
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-"""Shared Gmail helpers for the business.google collection.
+"""Shared Gmail helpers for the zjleblanc.gsuite collection.
 
 Provides Gmail search-query construction and message parsing so every
 module in this collection that reads Gmail messages behaves consistently.

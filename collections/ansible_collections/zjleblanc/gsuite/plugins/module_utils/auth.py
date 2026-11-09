@@ -3,7 +3,7 @@
 # Copyright: (c) 2026, Zachary LeBlanc
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-"""Shared Google authentication helpers for the business.google collection.
+"""Shared Google authentication helpers for the zjleblanc.gsuite collection.
 
 Centralizes service account credential resolution and loading so every
 module in this collection authenticates the same way without duplicating

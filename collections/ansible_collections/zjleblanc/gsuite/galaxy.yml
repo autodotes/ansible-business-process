@@ -1,6 +1,6 @@
 ---
-namespace: business
-name: google
+namespace: zjleblanc
+name: gsuite
 version: 1.0.0
 readme: README.md
 authors:

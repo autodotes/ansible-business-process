@@ -86,13 +86,13 @@ requirements:
 
 EXAMPLES = r'''
 - name: Read a single cell (uses GOOGLE_SA_CRED_PATH and GOOGLE_SHEET_ID)
-  business.google.gsheet_read:
+  zjleblanc.gsuite.gsheet_read:
     sheet: Data
     range: "E17"
   register: total_tasks_cell
 
 - name: Read account names alongside their hyperlink URLs
-  business.google.gsheet_read:
+  zjleblanc.gsuite.gsheet_read:
     credentials_path: /path/to/service-account.json
     gsheet_id: "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
     sheet: Data
@@ -101,7 +101,7 @@ EXAMPLES = r'''
   register: gsheet_accounts
 
 - name: Read using explicit OAuth2 credentials instead of a service account
-  business.google.gsheet_read:
+  zjleblanc.gsuite.gsheet_read:
     client_id: "{{ google_client_id }}"
     client_secret: "{{ google_client_secret }}"
     refresh_token: "{{ google_refresh_token }}"
@@ -140,7 +140,7 @@ range:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.business.google.plugins.module_utils.auth import (
+from ansible_collections.zjleblanc.gsuite.plugins.module_utils.auth import (
     GOOGLE_CLIENT_ID_ENV,
     GOOGLE_CLIENT_SECRET_ENV,
     GOOGLE_REFRESH_TOKEN_ENV,
@@ -156,7 +156,7 @@ from ansible_collections.business.google.plugins.module_utils.auth import (
     resolve_gsheet_id,
     resolve_oauth_param,
 )
-from ansible_collections.business.google.plugins.module_utils.gsheets import (
+from ansible_collections.zjleblanc.gsuite.plugins.module_utils.gsheets import (
     sheet_range,
 )
 

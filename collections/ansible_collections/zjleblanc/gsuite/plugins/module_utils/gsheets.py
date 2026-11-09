@@ -3,7 +3,7 @@
 # Copyright: (c) 2026, Zachary LeBlanc
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-"""Shared Google Sheets helpers for the business.google collection.
+"""Shared Google Sheets helpers for the zjleblanc.gsuite collection.
 
 Provides A1-notation range building and value coercion so every module in
 this collection that reads or writes Sheets cells behaves consistently.

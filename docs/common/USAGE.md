@@ -145,8 +145,8 @@ types, in dependency-aware order.
 Go to **Automation Execution → Infrastructure → Credential Types → Add**, and create each type
 below using **Input configuration** / **Injector configuration** in YAML mode (the field IDs
 must match exactly — they're referenced by name in
-[gsheet_update.py](../../collections/ansible_collections/business/support/plugins/modules/gsheet_update.py),
-[gsheet_tracker.py](../../collections/ansible_collections/business/support/plugins/modules/gsheet_tracker.py),
+[gsheet_update.py](../../collections/ansible_collections/zjleblanc/rh_case_mgmt/plugins/modules/gsheet_update.py),
+[gsheet_tracker.py](../../collections/ansible_collections/zjleblanc/rh_case_mgmt/plugins/modules/gsheet_tracker.py),
 and
 [support_case_tracking_email.html.j2](../../templates/support_case_tracking_email.html.j2) via
 the environment variables and extra vars they inject).
@@ -226,7 +226,7 @@ spreadsheet. As with the existing credentials in this file, reference vault-encr
 ### Execution environment
 
 Everything in this project runs with `hosts: localhost` / `ansible_connection: local`, which
-means the custom modules in `collections/ansible_collections/business/support/plugins/modules/`
+means the custom modules in `collections/ansible_collections/zjleblanc/rh_case_mgmt/plugins/modules/`
 execute **inside the Execution Environment's Python**, not on a managed node. This repo already
 builds a custom EE (see [execution-environment/](../../execution-environment/)) — add the new
 dependencies there rather than creating a second EE:
@@ -234,9 +234,9 @@ dependencies there rather than creating a second EE:
 - Python packages: already added to
   [execution-environment/requirements/requirements.txt](../../execution-environment/requirements/requirements.txt)
   (`openai`, `requests`, `python-dateutil`; `google-api-python-client` / `google-auth*` were
-  already present for `business.google`)
+  already present for `zjleblanc.gsuite`)
 - Collections: already added to
-  [collections/requirements.yml](../../collections/requirements.yml) (`business.support`,
+  [collections/requirements.yml](../../collections/requirements.yml) (`zjleblanc.rh_case_mgmt`,
   `community.general`)
 
 Rebuild the EE image after these changes:
@@ -352,7 +352,7 @@ Both job templates write to the **same spreadsheet** (`google_sheet_id`) but dif
   or `gsheet_lookup_value`) — the playbook writes the JSON report into the update column (e.g.
   column `O`) on the matching row. Create the header/lookup rows yourself before the first run.
 - **`Support Case Tracker`** tab (used by `pb_track_support_cases.yml`): fully self-managed by
-  the `business.support.gsheet_tracker` module — it creates the header row and all data rows
+  the `zjleblanc.rh_case_mgmt.gsheet_tracker` module — it creates the header row and all data rows
   itself on first run. You don't need to pre-create anything in this tab, just make sure the
   spreadsheet itself is shared with the service account (step 2).
 

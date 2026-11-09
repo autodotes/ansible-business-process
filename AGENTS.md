@@ -55,7 +55,7 @@ This is the **baseline standard**. This guide builds on top of it.
 Example structure:
 
 ```text
-collections/ansible_collections/business/example/
+collections/ansible_collections/zjleblanc/example/
   galaxy.yml
   meta/
     runtime.yml
@@ -97,11 +97,11 @@ Modules, `module_utils`, and filter/lookup plugins frequently depend on third-pa
 - Agents SHOULD group entries with a comment noting which collection/plugin requires them, e.g.:
 
   ```text
-  # Required by collections/ansible_collections/business/google (gmail_search, gsheet_update)
+  # Required by collections/ansible_collections/zjleblanc/gsuite (gmail_search, gsheet_update)
   google-api-python-client
   google-auth
 
-  # Required by collections/ansible_collections/business/custom (parse_sf_tasks filter)
+  # Required by collections/ansible_collections/zjleblanc/custom (parse_sf_tasks filter)
   beautifulsoup4
   ```
 

@@ -3,7 +3,7 @@
 ## Overview
 
 The support case analyzer workflow (`playbooks/pb_analyze_support_cases.yml`, via the
-`business.support.llm_summarize` module) supports **any OpenAI-compatible LLM API**, including:
+`zjleblanc.rh_case_mgmt.llm_summarize` module) supports **any OpenAI-compatible LLM API**, including:
 
 - **vLLM** — High-performance LLM serving (local or remote)
 - **Ollama** — Local LLM deployment

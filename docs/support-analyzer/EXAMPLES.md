@@ -282,12 +282,12 @@ ansible-navigator run playbooks/pb_analyze_support_cases.yml -e @vault.yml -e @a
 - **Google Sheets**: see [../common/GSUITE_QUICKSTART.md](../common/GSUITE_QUICKSTART.md) for
   service account setup
 - **GraphQL API**: `pb_analyze_support_cases.yml` queries `https://graphql.redhat.com` via the
-  `business.support.graphql_cases` module, which filters and paginates server-side. Override the
+  `zjleblanc.rh_case_mgmt.graphql_cases` module, which filters and paginates server-side. Override the
   endpoint or Apollo headers via `redhat_graphql_url`, `redhat_graphql_client_name`, and
   `redhat_graphql_client_version` in the playbook's `vars:` section (or `-e`)
 - **Product filtering**: use `product_filter` with the GraphQL `like` operator for starts-with
   matching (e.g. `{like: "Red Hat Ansible%"}`). See
-  [collections/ansible_collections/business/support/plugins/modules/graphql_cases.py](../../collections/ansible_collections/business/support/plugins/modules/graphql_cases.py)
+  [collections/ansible_collections/zjleblanc/rh_case_mgmt/plugins/modules/graphql_cases.py](../../collections/ansible_collections/zjleblanc/rh_case_mgmt/plugins/modules/graphql_cases.py)
   for all options
 
 ## Getting help

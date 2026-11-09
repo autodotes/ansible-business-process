@@ -1,6 +1,6 @@
 ---
-namespace: business
-name: support
+namespace: zjleblanc
+name: rh_case_mgmt
 version: 1.0.0
 readme: README.md
 authors:

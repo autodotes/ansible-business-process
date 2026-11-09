@@ -2,8 +2,6 @@
 # Collections requirements for ansible-lint / ansible-galaxy.
 # Paths are relative to the repository root (where ansible-lint runs).
 collections:
-  - name: ./collections/ansible_collections/business/google
-    type: dir
-  - name: ./collections/ansible_collections/business/support
-    type: dir
+  - name: zjleblanc.gsuite
+  - name: zjleblanc.rh_case_mgmt
   - name: community.general

@@ -32,7 +32,7 @@
         quiet: true
 
     - name: Search Gmail for the latest email with label | {{ gmail_label }}
-      business.google.gmail_search:
+      zjleblanc.gsuite.gmail_search:
         client_id: "{{ google_client_id | default(omit) }}"
         client_secret: "{{ google_client_secret | default(omit) }}"
         refresh_token: "{{ google_refresh_token | default(omit) }}"
@@ -45,10 +45,10 @@
 
     - name: Parse the Salesforce tasks report
       ansible.builtin.set_fact:
-        sf_report: "{{ gmail_label_search.messages[0].body | business.google.parse_sf_tasks }}"
+        sf_report: "{{ gmail_label_search.messages[0].body | zjleblanc.gsuite.parse_sf_tasks }}"
 
     - name: Read the gsheet's current total tasks cell
-      business.google.gsheet_read:
+      zjleblanc.gsuite.gsheet_read:
         gsheet_id: "{{ gsheet_id | default(omit) }}"
         credentials_path: "{{ google_credentials_path | default(omit) }}"
         credentials: "{{ google_credentials | default(omit) }}"
@@ -82,7 +82,7 @@
              else ai_rca_api_base ~ '/chat/completions' }}
 
     - name: Read gsheet account names and hyperlinks
-      business.google.gsheet_read:
+      zjleblanc.gsuite.gsheet_read:
         gsheet_id: "{{ gsheet_id | default(omit) }}"
         credentials_path: "{{ google_credentials_path | default(omit) }}"
         credentials: "{{ google_credentials | default(omit) }}"
@@ -98,7 +98,7 @@
       ansible.builtin.set_fact:
         matched_accounts: >-
           {{ sf_report.accounts
-             | business.google.match_sf_accounts(gsheet_accounts['values'], gsheet_accounts['hyperlinks']) }}
+             | zjleblanc.gsuite.match_sf_accounts(gsheet_accounts['values'], gsheet_accounts['hyperlinks']) }}
 
     - name: Summarize and update each matched account
       ansible.builtin.include_tasks: ../tasks/account_update.yml
@@ -108,7 +108,7 @@
         label: "{{ account.account }}"
 
     - name: Update total opps/tasks in the gsheet
-      business.google.gsheet_update:
+      zjleblanc.gsuite.gsheet_update:
         gsheet_id: "{{ gsheet_id | default(omit) }}"
         credentials_path: "{{ google_credentials_path | default(omit) }}"
         credentials: "{{ google_credentials | default(omit) }}"

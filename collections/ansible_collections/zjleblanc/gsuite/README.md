@@ -1,4 +1,4 @@
-# business.google
+# zjleblanc.gsuite
 
 Ansible collection for interacting with Google Workspace (gsuite) services.
 
@@ -22,14 +22,14 @@ Ansible collection for interacting with Google Workspace (gsuite) services.
 
 ```yaml
 # Single cell, by row lookup (original behavior)
-- business.google.gsheet_update:
+- zjleblanc.gsuite.gsheet_update:
     lookup_column: A
     lookup_value: "{{ account_name }}"
     update_column: C
     update_value: "{{ case_count }}"
 
 # Multiple columns on one looked-up row, in a single API call
-- business.google.gsheet_update:
+- zjleblanc.gsuite.gsheet_update:
     sheet: Data
     lookup_column: A
     lookup_value: "{{ account_name }}"
@@ -40,7 +40,7 @@ Ansible collection for interacting with Google Workspace (gsuite) services.
         value: "{{ total_tasks }}"
 
 # Direct cell references, no row lookup (e.g. a totals row)
-- business.google.gsheet_update:
+- zjleblanc.gsuite.gsheet_update:
     sheet: Data
     updates:
       - cell: D17

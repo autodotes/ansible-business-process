@@ -11,8 +11,8 @@ DOCUMENTATION = r'''
     short_description: Filter a list of Salesforce task dicts to only those within the last N months
     version_added: "1.3.0"
     description:
-        - Given a list of task dictionaries (as produced by M(business.google.parse_sf_tasks) or the flattened
-          C(tasks) list from M(business.google.match_sf_accounts)), returns only those whose C(date) field falls
+        - Given a list of task dictionaries (as produced by M(zjleblanc.gsuite.parse_sf_tasks) or the flattened
+          C(tasks) list from M(zjleblanc.gsuite.match_sf_accounts)), returns only those whose C(date) field falls
           within the last N months from today.
         - Tasks with missing or unparseable dates are excluded from the result.
     positional: _input, months
@@ -31,11 +31,11 @@ DOCUMENTATION = r'''
 EXAMPLES = r'''
 - name: Keep only tasks from the last 3 months
   ansible.builtin.set_fact:
-    recent: "{{ account.tasks | business.google.recent_tasks(3) }}"
+    recent: "{{ account.tasks | zjleblanc.gsuite.recent_tasks(3) }}"
 
 - name: Keep only tasks from the last 6 months
   ansible.builtin.set_fact:
-    recent: "{{ account.tasks | business.google.recent_tasks(6) }}"
+    recent: "{{ account.tasks | zjleblanc.gsuite.recent_tasks(6) }}"
 '''
 
 RETURN = r'''

@@ -4,7 +4,7 @@
 
 - name: Filter tasks to last 3 months for {{ account.account }}
   ansible.builtin.set_fact:
-    _recent_tasks: "{{ account.tasks | business.google.recent_tasks(3) }}"
+    _recent_tasks: "{{ account.tasks | zjleblanc.gsuite.recent_tasks(3) }}"
 
 - name: Summarize and update (has recent activity)
   when: _recent_tasks | length > 0
@@ -32,7 +32,7 @@
         status_code: [200]
 
     - name: Update gsheet row for account {{ account.account }}
-      business.google.gsheet_update:
+      zjleblanc.gsuite.gsheet_update:
         gsheet_id: "{{ gsheet_id | default(omit) }}"
         credentials_path: "{{ google_credentials_path | default(omit) }}"
         credentials: "{{ google_credentials | default(omit) }}"
@@ -54,7 +54,7 @@
 
 - name: Update gsheet row with empty summary for {{ account.account }}
   when: _recent_tasks | length == 0
-  business.google.gsheet_update:
+  zjleblanc.gsuite.gsheet_update:
     gsheet_id: "{{ gsheet_id | default(omit) }}"
     credentials_path: "{{ google_credentials_path | default(omit) }}"
     credentials: "{{ google_credentials | default(omit) }}"

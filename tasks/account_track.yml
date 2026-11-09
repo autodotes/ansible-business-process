@@ -19,7 +19,7 @@
   tags: [always, fetch]
 
 - name: Fetch support cases via GraphQL | {{ account.name }}
-  business.support.graphql_cases:
+  zjleblanc.rh_case_mgmt.graphql_cases:
     access_token: "{{ redhat_access_token }}"
     graphql_url: "{{ redhat_graphql_url }}"
     client_name: "{{ redhat_graphql_client_name }}"
@@ -58,7 +58,7 @@
   tags: [always]
 
 - name: Compute diff against previous state (no sheet write yet) | {{ account.name }}
-  business.support.gsheet_tracker:
+  zjleblanc.rh_case_mgmt.gsheet_tracker:
     state: diff
     account_name: "{{ support_case_account_name }}"
     existing_rows: "{{ r_tracker_read.existing_rows }}"

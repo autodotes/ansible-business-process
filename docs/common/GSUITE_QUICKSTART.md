@@ -11,7 +11,7 @@ auth model, just different worksheet tabs).
    `support_case_accounts`.
 2. With the `json` tag (included in a normal run), it renders
    [templates/support_case_analysis.json.j2](../../templates/support_case_analysis.json.j2) and
-   calls `business.support.gsheet_update`.
+   calls `zjleblanc.rh_case_mgmt.gsheet_update`.
 3. The module finds a row where the **lookup column** matches the account name (or
    `gsheet_lookup_value`), then writes the JSON into the **update column**.
 
@@ -20,7 +20,7 @@ Spreadsheet row:  ... | K (lookup) = "Parasol" | ... | O (update) = { "report": 
 ```
 
 The tracker playbook (`playbooks/pb_track_support_cases.yml`) uses the same service account but
-owns a separate, dedicated worksheet tab end-to-end via `business.support.gsheet_tracker` — see
+owns a separate, dedicated worksheet tab end-to-end via `zjleblanc.rh_case_mgmt.gsheet_tracker` — see
 [../support-tracker/EXAMPLES.md](../support-tracker/EXAMPLES.md).
 
 ## 1. Google Cloud setup
@@ -62,7 +62,7 @@ pip install -r execution-environment/requirements/requirements.txt
 ```
 
 This installs `google-api-python-client` and `google-auth`, required by
-[collections/ansible_collections/business/support/plugins/modules/gsheet_update.py](../../collections/ansible_collections/business/support/plugins/modules/gsheet_update.py).
+[collections/ansible_collections/zjleblanc/rh_case_mgmt/plugins/modules/gsheet_update.py](../../collections/ansible_collections/zjleblanc/rh_case_mgmt/plugins/modules/gsheet_update.py).
 
 ## 3. Configure credentials
 
@@ -160,7 +160,7 @@ Direct module usage (e.g. in another playbook):
 
 ```yaml
 - name: Update spreadsheet cell
-  business.support.gsheet_update:
+  zjleblanc.rh_case_mgmt.gsheet_update:
     sheet: Customers
     lookup_column: A
     lookup_value: "{{ support_case_account_name }}"
@@ -171,11 +171,11 @@ Direct module usage (e.g. in another playbook):
 Credentials: `credentials_path` / `GOOGLE_SA_CRED_PATH`, or `credentials` dict from Vault.
 Spreadsheet: `gsheet_id` / `GOOGLE_SHEET_ID`.
 
-> Note: `business.support.gsheet_update` is service-account-only and single-cell per call (with
+> Note: `zjleblanc.rh_case_mgmt.gsheet_update` is service-account-only and single-cell per call (with
 > smart JSON truncation for the 50k cell limit). The Salesforce account-tasks workflow in this
-> repo uses the separate `business.google.gsheet_update`, which supports OAuth2 and batch
+> repo uses the separate `zjleblanc.gsuite.gsheet_update`, which supports OAuth2 and batch
 > `updates`. See
-> [collections/ansible_collections/business/support/README.md](../../collections/ansible_collections/business/support/README.md#note-on-the-separate-businessgooglegsheet_update)
+> [collections/ansible_collections/zjleblanc/rh_case_mgmt/README.md](../../collections/ansible_collections/zjleblanc/rh_case_mgmt/README.md#note-on-the-separate-zjleblancgsuitegsheet_update)
 > for the distinction.
 
 ## Related docs

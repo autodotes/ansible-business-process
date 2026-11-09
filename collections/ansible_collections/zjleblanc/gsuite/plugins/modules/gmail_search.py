@@ -92,7 +92,7 @@ requirements:
 
 EXAMPLES = r'''
 - name: Get the single most recent unread message in the inbox
-  business.google.gmail_search:
+  zjleblanc.gsuite.gmail_search:
     labels:
       - INBOX
       - UNREAD
@@ -101,14 +101,14 @@ EXAMPLES = r'''
   register: latest_unread
 
 - name: Get the top 3 messages from a specific sender with a subject match
-  business.google.gmail_search:
+  zjleblanc.gsuite.gmail_search:
     from_addr: alerts@example.com
     subject: "Deployment failed"
     max_results: 3
   register: deployment_alerts
 
 - name: Search using explicit OAuth2 credentials and a raw query
-  business.google.gmail_search:
+  zjleblanc.gsuite.gmail_search:
     client_id: "{{ vault_google_client_id }}"
     client_secret: "{{ vault_google_client_secret }}"
     refresh_token: "{{ vault_google_refresh_token }}"
@@ -116,7 +116,7 @@ EXAMPLES = r'''
     max_results: 10
 
 - name: Fail the play if no invoice email arrived this month
-  business.google.gmail_search:
+  zjleblanc.gsuite.gmail_search:
     from_addr: billing@example.com
     subject: Invoice
     after: "2026/08/01"
@@ -170,7 +170,7 @@ query:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.business.google.plugins.module_utils.auth import (
+from ansible_collections.zjleblanc.gsuite.plugins.module_utils.auth import (
     GMAIL_READONLY_SCOPES,
     OAUTH_ARGSPEC,
     HttpError,
@@ -179,7 +179,7 @@ from ansible_collections.business.google.plugins.module_utils.auth import (
     load_oauth_credentials,
     resolve_oauth_param,
 )
-from ansible_collections.business.google.plugins.module_utils.gmail import (
+from ansible_collections.zjleblanc.gsuite.plugins.module_utils.gmail import (
     build_query,
     parse_message,
 )

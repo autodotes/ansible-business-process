@@ -32,7 +32,7 @@ DOCUMENTATION = r'''
 EXAMPLES = r'''
 - name: Parse Salesforce tasks from a report email body
   ansible.builtin.set_fact:
-    sf_report: "{{ gmail_label_search.messages[0].body | business.google.parse_sf_tasks }}"
+    sf_report: "{{ gmail_label_search.messages[0].body | zjleblanc.gsuite.parse_sf_tasks }}"
 
 - name: Access root-level summary counts
   ansible.builtin.debug:

@@ -9,17 +9,17 @@ credential setup shared by both workflows.
 **own job template** on a cadence (cron, AAP schedule, etc.). Each run:
 
 1. Reads the tracker sheet **once, for every tracked account at the same time** (via
-   `business.support.gsheet_tracker state=read`) to retrieve each account's `last_seen_timestamp`
+   `zjleblanc.rh_case_mgmt.gsheet_tracker state=read`) to retrieve each account's `last_seen_timestamp`
    from the previous run, plus the raw rows belonging to any account *not* in this run
    (`other_rows`).
 2. Per account, queries only non-closed cases modified **since that account's previous run**
    through the GraphQL API (`status_filter`, default `{ne: "Closed"}`, excludes closed cases
    server-side) — avoids re-fetching the entire case history on every cadence tick.
 3. Diffs the current cases against what was recorded on the previous run (new / closed / changed
-   severity, status, or owner) via `business.support.gsheet_tracker state=diff` — a pure local
+   severity, status, or owner) via `zjleblanc.rh_case_mgmt.gsheet_tracker state=diff` — a pure local
    computation with **no Google API calls** — and accumulates that account's replacement rows.
 4. After every account has been processed, writes the whole tab **exactly once**
-   (`business.support.gsheet_tracker state=write`: `other_rows` + every account's accumulated
+   (`zjleblanc.rh_case_mgmt.gsheet_tracker state=write`: `other_rows` + every account's accumulated
    rows in a single clear+rewrite) — a dedicated worksheet tab that the `gsheet_tracker` module
    owns completely (header row and all data rows). It is *not* the `Accounts` tab used by
    `pb_analyze_support_cases.yml`, and does not rely on that playbook's lookup/update column
@@ -163,8 +163,8 @@ replaced with that account's freshly-diffed rows.
 
 ## What the module returns, by state
 
-The `business.support.gsheet_tracker` module (see
-[collections/ansible_collections/business/support/plugins/modules/gsheet_tracker.py](../../collections/ansible_collections/business/support/plugins/modules/gsheet_tracker.py))
+The `zjleblanc.rh_case_mgmt.gsheet_tracker` module (see
+[collections/ansible_collections/zjleblanc/rh_case_mgmt/plugins/modules/gsheet_tracker.py](../../collections/ansible_collections/zjleblanc/rh_case_mgmt/plugins/modules/gsheet_tracker.py))
 has three states, called in this order once per run:
 
 - **`state: read`** (once, before the account loop) — returns `existing_rows` (the full raw

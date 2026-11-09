@@ -10,7 +10,7 @@
 
   tasks:
     - name: Search Gmail for the latest email with label | {{ gmail_label }}
-      business.google.gmail_search:
+      zjleblanc.gsuite.gmail_search:
         labels:
           - "{{ gmail_label }}"
         max_results: 1
@@ -25,5 +25,5 @@
 
     - name: Show the parsed report data
       ansible.builtin.copy:
-        content: "{{ gmail_label_search.messages[0].body | business.google.parse_sf_tasks | to_nice_json(indent=2) }}"
+        content: "{{ gmail_label_search.messages[0].body | zjleblanc.gsuite.parse_sf_tasks | to_nice_json(indent=2) }}"
         dest: .artifacts/report.parsed.json
