@@ -1,23 +1,21 @@
+---
 # Pre-commit hooks for ansible-business-process
 # Install: pre-commit install
 # Run all: pre-commit run --all-files
-
 repos:
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.1
     hooks:
       - id: gitleaks
-
   - repo: https://github.com/ansible/ansible-lint
     rev: v26.9.0
     hooks:
       - id: ansible-lint
-
   - repo: local
     hooks:
       - id: cspell
         name: cspell
         entry: cspell --no-must-find-files --no-progress
         language: node
-        additional_dependencies: ["cspell@10.3.6"]
+        additional_dependencies: [cspell@10.3.6]
         types: [markdown]

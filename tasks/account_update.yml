@@ -1,24 +1,20 @@
 # References:
 #   - playbooks/pb_update_account_tasks.yml:107
 ---
-
 - name: Filter tasks to last 3 months for {{ account.account }}
   ansible.builtin.set_fact:
     _recent_tasks: "{{ account.tasks | zjleblanc.gsuite.recent_tasks(3) }}"
-
 - name: Summarize and update (has recent activity)
   when: _recent_tasks | length > 0
   block:
     - name: Request AI tasks summary for {{ account.account }}
-      register: r_ai_summary
-      no_log: "{{ ai_rca_secure_logging | default(true) | bool }}"
       ansible.builtin.uri:
         url: "{{ ai_rca_api_url }}"
         method: POST
         timeout: 60
         validate_certs: "{{ ai_rca_validate_certs | default(true) | bool }}"
         headers:
-          Authorization: "Bearer {{ ai_rca_api_key }}"
+          Authorization: Bearer {{ ai_rca_api_key }}
           Content-Type: application/json
         body_format: json
         body:
@@ -30,6 +26,8 @@
             - role: user
               content: "{{ _recent_tasks | to_json }}"
         status_code: [200]
+      register: r_ai_summary
+      no_log: "{{ ai_rca_secure_logging | default(true) | bool }}"
 
     - name: Update gsheet row for account {{ account.account }}
       zjleblanc.gsuite.gsheet_update:
@@ -53,7 +51,6 @@
             value: "{{ account.tasks | to_json }}"
 
 - name: Update gsheet row with empty summary for {{ account.account }}
-  when: _recent_tasks | length == 0
   zjleblanc.gsuite.gsheet_update:
     gsheet_id: "{{ gsheet_id | default(omit) }}"
     credentials_path: "{{ google_credentials_path | default(omit) }}"
@@ -73,3 +70,4 @@
         value: "{}"
       - column: G
         value: "{{ account.tasks | to_json }}"
+  when: _recent_tasks | length == 0

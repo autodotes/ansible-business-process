@@ -4,10 +4,8 @@
 - name: Analyze Red Hat support cases with AI
   hosts: localhost
   gather_facts: false
-
   vars_files:
     - vars/analyze_support_cases.yml
-
   tasks:
     - name: Assert required variables are provided
       ansible.builtin.assert:
@@ -25,11 +23,11 @@
         quiet: true
 
     - name: Build account list from legacy single-account variables
-      when: support_case_accounts is not defined
       ansible.builtin.set_fact:
         support_case_accounts:
           - name: "{{ support_case_account_name }}"
             ids: "{{ support_case_account_ids }}"
+      when: support_case_accounts is not defined
 
     - name: Validate account configuration
       ansible.builtin.assert:
@@ -41,13 +39,13 @@
         fail_msg: >-
           No accounts configured. Provide support_case_accounts (list of name/ids dicts) or
           support_case_account_name + support_case_account_ids for a single account.
-        success_msg: "Processing {{ support_case_accounts | length }} account configuration(s)"
+        success_msg: Processing {{ support_case_accounts | length }} account configuration(s)
 
     - name: Ensure reports directory exists
       ansible.builtin.file:
         path: reports
         state: directory
-        mode: '0755'
+        mode: "0755"
 
     - name: Exchange offline token for access token via Red Hat SSO
       ansible.builtin.uri:

@@ -1,14 +1,7 @@
 ---
 # yaml-language-server: $schema=none
-namespace: zjleblanc
 name: rh_case_mgmt
-version: 0.0.0-semantic-version
-readme: README.md
-authors:
-  - Ansible Business Process
-description: Modules for fetching, summarizing, and tracking Red Hat support cases.
-license:
-  - GPL-3.0-or-later
+namespace: zjleblanc
 tags:
   - tools
   - redhat
@@ -16,6 +9,13 @@ tags:
   - graphql
   - llm
   - sheets
+version: 0.0.0-semantic-version
+readme: README.md
+authors:
+  - Ansible Business Process
+description: Modules for fetching, summarizing, and tracking Red Hat support cases.
+license:
+  - GPL-3.0-or-later
 repository: https://github.com/autodotes/ansible-business-process
 documentation: https://github.com/autodotes/ansible-business-process/blob/main/collections/ansible_collections/zjleblanc/rh_case_mgmt/README.md
 homepage: https://github.com/autodotes/ansible-business-process

@@ -14,7 +14,6 @@ controller_templates:
       - OpenAI Config
     labels:
       - Business
-
   - name: BPA // Support Case Analyzer
     description: >-
       Fetch Red Hat support cases via GraphQL, summarize with AI, and write
@@ -28,7 +27,6 @@ controller_templates:
       - Support Analyzer - Accounts
     labels:
       - Business
-
   - name: BPA // Support Case Tracker
     description: >-
       Track active Red Hat support cases in a dedicated worksheet tab, diff

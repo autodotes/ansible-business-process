@@ -3,7 +3,6 @@
 - name: Deploy AAP configuration
   hosts: localhost
   gather_facts: false
-
   tasks:
     - name: Load AAP configuration
       ansible.builtin.include_vars:

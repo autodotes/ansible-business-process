@@ -1,12 +1,11 @@
 ---
 # Red Hat API and GraphQL client settings.
-redhat_sso_url: "https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token"
-redhat_graphql_url: "https://graphql.redhat.com"
-redhat_graphql_client_name: "ansible-business-process"
+redhat_sso_url: https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+redhat_graphql_url: https://graphql.redhat.com
+redhat_graphql_client_name: ansible-business-process
 redhat_graphql_client_version: "1.0"
 redhat_graphql_page_size: 200
 redhat_api_timeout: 30
-
 # LLM request tuning and model connection inputs.
 llm_temperature: 0.7
 llm_max_tokens: 2048
@@ -14,7 +13,6 @@ llm_timeout: 120
 llm_model: "{{ lookup('ansible.builtin.env', 'LLM_MODEL') }}"
 llm_api_key: "{{ lookup('ansible.builtin.env', 'LLM_API_KEY') }}"
 llm_api_base_url: "{{ lookup('ansible.builtin.env', 'LLM_API_BASE_URL') }}"
-
 # Google Sheets destination and update behavior.
 gsheet_sheet: "{{ lookup('ansible.builtin.env', 'GSHEET_SHEET') | default('Accounts', true) }}"
 google_sheet_id: "{{ lookup('ansible.builtin.env', 'GOOGLE_SHEET_ID') }}"
@@ -23,19 +21,16 @@ tower:
 gsheet_lookup_column: "{{ lookup('ansible.builtin.env', 'GSHEET_LOOKUP_COLUMN') | default('K', true) }}"
 gsheet_update_column: "{{ lookup('ansible.builtin.env', 'GSHEET_UPDATE_COLUMN') | default('O', true) }}"
 gsheet_truncate_priority_products:
-  - "Ansible"
-
+  - Ansible
 # Red Hat API authentication token.
 redhat_offline_token: "{{ lookup('ansible.builtin.env', 'REDHAT_OFFLINE_TOKEN') }}"
-
 # Case filtering for report size control.
 analyze_closed_case_days: 90
-
 # Derived dates, output names, and logging defaults.
 activity_date: >-
   {{
     (now().replace(month=((now().month - 7) % 12 + 1), year=now().year - (1 if now().month <= 6 else 0)))
     .strftime('%Y-%m-%d')
   }}
-analysis_file_dest: "reports/{{ support_case_account_name | default('Account') }}_support_case_summary_{{ now(fmt='%Y-%m-%d') }}"
+analysis_file_dest: reports/{{ support_case_account_name | default('Account') }}_support_case_summary_{{ now(fmt='%Y-%m-%d') }}
 secure_logging: true
