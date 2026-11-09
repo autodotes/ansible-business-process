@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=none
-name: Rh_case_mgmt
+name: rh_case_mgmt
 namespace: zjleblanc
 tags:
   - tools

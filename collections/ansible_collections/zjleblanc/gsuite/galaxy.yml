@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=none
-name: Gsuite
+name: gsuite
 namespace: zjleblanc
 tags:
   - tools
