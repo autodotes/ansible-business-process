@@ -3,10 +3,8 @@
 - name: Track Red Hat support cases and notify on changes
   hosts: localhost
   gather_facts: false
-
   vars_files:
     - vars/track_support_cases.yml
-
   tasks:
     - name: Assert required variables are provided
       ansible.builtin.assert:
@@ -29,11 +27,11 @@
         quiet: true
 
     - name: Build account list from legacy single-account variables
-      when: support_case_accounts is not defined
       ansible.builtin.set_fact:
         support_case_accounts:
           - name: "{{ support_case_account_name }}"
             ids: "{{ support_case_account_ids }}"
+      when: support_case_accounts is not defined
 
     - name: Validate account configuration
       ansible.builtin.assert:
@@ -45,10 +43,9 @@
         fail_msg: >-
           No accounts configured. Provide support_case_accounts (list of name/ids dicts) or
           support_case_account_name + support_case_account_ids for a single account.
-        success_msg: "Tracking {{ support_case_accounts | length }} account configuration(s)"
+        success_msg: Tracking {{ support_case_accounts | length }} account configuration(s)
 
     - name: Normalize notification pairings from legacy tracker_email_to
-      when: tracker_notifications is not defined
       ansible.builtin.assert:
         that:
           - tracker_email_to is defined
@@ -58,13 +55,14 @@
         fail_msg: >-
           tracker_email_to must be a non-empty list when tracker_notifications is omitted.
         quiet: true
+      when: tracker_notifications is not defined
 
     - name: Build notification pairings from legacy tracker_email_to
-      when: tracker_notifications is not defined
       ansible.builtin.set_fact:
         tracker_notifications:
           - to: "{{ tracker_email_to }}"
             accounts: all
+      when: tracker_notifications is not defined
 
     - name: Validate notification pairings list
       ansible.builtin.assert:
@@ -76,22 +74,9 @@
         fail_msg: >-
           Provide tracker_notifications (non-empty list of to/accounts pairings) or
           tracker_email_to (non-empty list) for a single all-accounts notification.
-        success_msg: "Configured {{ tracker_notifications | length }} notification pairing(s)"
+        success_msg: Configured {{ tracker_notifications | length }} notification pairing(s)
 
     - name: Validate each notification pairing
-      vars:
-        _to: "{{ notification.to | default([]) }}"
-        _accounts: "{{ notification.accounts | default('') }}"
-        _pull_names: "{{ support_case_accounts | map(attribute='name') | list }}"
-        _unknown: >-
-          {{
-            [] if (_accounts == 'all')
-            else (
-              (_accounts | difference(_pull_names))
-              if (_accounts is sequence and _accounts is not string)
-              else ['<accounts must be all or a list>']
-            )
-          }}
       ansible.builtin.assert:
         that:
           - _to is sequence
@@ -110,6 +95,19 @@
       loop_control:
         loop_var: notification
         label: "{{ notification.to | default(['?']) | join(',') }}"
+      vars:
+        _to: "{{ notification.to | default([]) }}"
+        _accounts: "{{ notification.accounts | default('') }}"
+        _pull_names: "{{ support_case_accounts | map(attribute='name') | list }}"
+        _unknown: >-
+          {{
+            [] if (_accounts == 'all')
+            else (
+              (_accounts | difference(_pull_names))
+              if (_accounts is sequence and _accounts is not string)
+              else ['<accounts must be all or a list>']
+            )
+          }}
 
     - name: Exchange offline token for access token via Red Hat SSO
       ansible.builtin.uri:
@@ -163,22 +161,6 @@
       register: r_tracker_write
 
     - name: Send change notification email
-      vars:
-        notification_results: >-
-          {{
-            tracking_results
-            if (notification.accounts == 'all')
-            else (tracking_results | selectattr('account', 'in', notification.accounts) | list)
-          }}
-      when: >-
-        tracker_notify_on_no_changes
-        or (
-          (
-            tracking_results
-            if (notification.accounts == 'all')
-            else (tracking_results | selectattr('account', 'in', notification.accounts) | list)
-          ) | selectattr('has_changes') | list | length > 0
-        )
       community.general.mail:
         host: "{{ email_smtp_server }}"
         port: "{{ email_smtp_server_port | default(omit) }}"
@@ -201,19 +183,35 @@
           }}
         subtype: html
         body: "{{ lookup('template', '../templates/support_case_tracking_email.html.j2') }}"
+      when: >-
+        tracker_notify_on_no_changes
+        or (
+          (
+            tracking_results
+            if (notification.accounts == 'all')
+            else (tracking_results | selectattr('account', 'in', notification.accounts) | list)
+          ) | selectattr('has_changes') | list | length > 0
+        )
       loop: "{{ tracker_notifications }}"
       loop_control:
         loop_var: notification
         label: "{{ notification.to | join(',') }}"
       register: r_tracker_notifications
       no_log: "{{ secure_logging }}"
+      vars:
+        notification_results: >-
+          {{
+            tracking_results
+            if (notification.accounts == 'all')
+            else (tracking_results | selectattr('account', 'in', notification.accounts) | list)
+          }}
 
     - name: Display tracking run summary
       ansible.builtin.debug:
         msg:
-          - "============================================"
-          - "Support Case Tracking Run Complete!"
-          - "============================================"
+          - ============================================
+          - Support Case Tracking Run Complete!
+          - ============================================
           - "Accounts Tracked: {{ tracking_results | length }}"
           - "Accounts With Changes: {{ tracking_results | selectattr('has_changes') | list | length }}"
           - >-
@@ -221,4 +219,4 @@
             {{ r_tracker_notifications.results | json_query('[?!skipped]') | length }}
             /
             {{ tracker_notifications | length }}
-          - "============================================"
+          - ============================================

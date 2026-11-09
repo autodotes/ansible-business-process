@@ -2,8 +2,6 @@
 ---
 - name: Process latest e-mail report and update account dashboard data source
   hosts: localhost
-  gather_facts: false
-
   vars:
     ai_rca_temperature: 0.3
     ai_rca_system_prompt: >-
@@ -12,7 +10,7 @@
       plain-text summary (3-6 sentences, no markdown or HTML formatting) covering the main themes of
       recent activity, notable customer signals, and any follow-ups that appear outstanding. Do not
       simply repeat the raw task list back.
-
+  gather_facts: false
   tasks:
     - name: Assert required variables are provided
       ansible.builtin.assert:
@@ -40,8 +38,8 @@
           - "{{ gmail_label }}"
         max_results: 1
         message_format: full
-      register: gmail_label_search
       failed_when: gmail_label_search.messages | default([]) | length == 0
+      register: gmail_label_search
 
     - name: Parse the Salesforce tasks report
       ansible.builtin.set_fact:
@@ -80,7 +78,6 @@
         ai_rca_api_url: >-
           {{ ai_rca_api_base if 'chat/completions' in ai_rca_api_base
              else ai_rca_api_base ~ '/chat/completions' }}
-
     - name: Read gsheet account names and hyperlinks
       zjleblanc.gsuite.gsheet_read:
         gsheet_id: "{{ gsheet_id | default(omit) }}"
@@ -93,20 +90,17 @@
         range: "{{ gsheet_account_range }}"
         include_hyperlinks: true
       register: gsheet_accounts
-
     - name: Match report accounts to gsheet rows by Salesforce record ID
       ansible.builtin.set_fact:
         matched_accounts: >-
           {{ sf_report.accounts
              | zjleblanc.gsuite.match_sf_accounts(gsheet_accounts['values'], gsheet_accounts['hyperlinks']) }}
-
     - name: Summarize and update each matched account
       ansible.builtin.include_tasks: ../tasks/account_update.yml
       loop: "{{ matched_accounts }}"
       loop_control:
         loop_var: account
         label: "{{ account.account }}"
-
     - name: Update total opps/tasks in the gsheet
       zjleblanc.gsuite.gsheet_update:
         gsheet_id: "{{ gsheet_id | default(omit) }}"
@@ -121,7 +115,6 @@
             value: "{{ sf_report.total_opps }}"
           - cell: "{{ gsheet_total_tasks_cell }}"
             value: "{{ sf_report.total_tasks }}"
-
     - name: Summary
       ansible.builtin.debug:
         msg: >-
