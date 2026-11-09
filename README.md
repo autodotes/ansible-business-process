@@ -108,6 +108,9 @@ back the workflows above:
   a playbook syntax check, and a Markdown spell check on every push/PR;
   [`gitleaks.yml`](.github/workflows/gitleaks.yml) scans for committed secrets;
   [`spotter-ci.yml`](.github/workflows/spotter-ci.yml) runs Steampunk Spotter analysis;
+  [`publish.yml`](.github/workflows/publish.yml) tags and publishes `zjleblanc.gsuite` /
+  `zjleblanc.rh_case_mgmt` to Ansible Galaxy when those collection trees change (or via
+  manual dispatch), using independent tags ending in `-gsuite` / `-rh-case-mgmt`;
   [`build-execution-environment.yml`](.github/workflows/build-execution-environment.yml) builds
   and publishes the EE image weekly and on PRs that touch it;
   [`demo-intelligent-cac-deploy.yml`](.github/workflows/demo-intelligent-cac-deploy.yml) is a

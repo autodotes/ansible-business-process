@@ -1,7 +1,8 @@
 ---
+# yaml-language-server: $schema=none
 namespace: zjleblanc
 name: gsuite
-version: 1.0.0
+version: 0.0.0-semantic-version
 readme: README.md
 authors:
   - Ansible Business Process
@@ -9,12 +10,15 @@ description: Modules and plugins for interacting with Google Workspace (gsuite) 
 license:
   - GPL-3.0-or-later
 tags:
+  - tools
   - google
   - gsuite
   - sheets
   - gmail
   - filter
   - salesforce
-repository: https://github.com/zjleblanc/ansible-support-analyzer
-issues: https://github.com/zjleblanc/ansible-support-analyzer/issues
+repository: https://github.com/autodotes/ansible-business-process
+documentation: https://github.com/autodotes/ansible-business-process/blob/main/collections/ansible_collections/zjleblanc/gsuite/README.md
+homepage: https://github.com/autodotes/ansible-business-process
+issues: https://github.com/autodotes/ansible-business-process/issues
 build_ignore: []

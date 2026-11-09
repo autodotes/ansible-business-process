@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-11-09 — Publish local collections to Ansible Galaxy
+
+### Added
+- [`.github/workflows/publish.yml`](.github/workflows/publish.yml) publishes
+  `zjleblanc.gsuite` and `zjleblanc.rh_case_mgmt` to Ansible Galaxy on push to `main`
+  when those collection paths change, or via manual `workflow_dispatch`.
+- [`.github/scripts/increment-tag.sh`](.github/scripts/increment-tag.sh) bumps each
+  collection independently with tags `vX.Y.Z-gsuite` and `vX.Y.Z-rh-case-mgmt`.
+- [`ansible.cfg.publish`](ansible.cfg.publish) for Galaxy token injection during publish.
+
+### Changed
+- Both collection `galaxy.yml` files use the `0.0.0-semantic-version` placeholder and
+  point repository/docs URLs at `autodotes/ansible-business-process`.
+- README CI section documents the new publish workflow and tag suffixes.
+
 ## 2026-11-09 — Rename local collections
 
 ### Changed
