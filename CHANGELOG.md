@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-11-16 — Fix support tracker new/updated/closed classification
+
+### Fixed
+- Tracker no longer classifies unchanged open cases as new. Each run now fetches
+  every non-closed case for the account and writes that full snapshot to the
+  sheet, so the next run diffs against the complete previous open set instead of
+  a last-modified delta that was wiped on clear+rewrite.
+
+### Changed
+- Removed the Last Seen / `tracker_last_run_date` / `activity_date` GraphQL cutoff
+  from `tasks/account_track.yml` and the tracker-only date vars from
+  `playbooks/vars/track_support_cases.yml`. `Last Seen` remains a run stamp on
+  written rows only.
+- Updated `docs/support-tracker/DATA_FLOW.md` and `docs/support-tracker/EXAMPLES.md`
+  to describe the full open-case snapshot model.
+
 ## 2026-11-09 — Tune CI secret scan and Spotter triggers
 
 ### Changed

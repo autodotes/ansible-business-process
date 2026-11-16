@@ -7,16 +7,6 @@ redhat_graphql_client_version: "1.0"
 redhat_graphql_page_size: 200
 redhat_api_timeout: 30
 redhat_offline_token: "{{ lookup('ansible.builtin.env', 'REDHAT_OFFLINE_TOKEN') }}"
-
-# Date formatting and window used to filter tracked support activity.
-gsheet_date_format: "%Y-%m-%d"
-gsheet_datetime_format: "%Y-%m-%d %H:%M:%S"
-activity_date: >-
-  {{
-    (now().replace(month=((now().month - 7) % 12 + 1), year=now().year - (1 if now().month <= 6 else 0)))
-    .strftime(gsheet_date_format)
-  }}
-
 # Google Sheets tracker destination and status filtering.
 gsheet_sheet: "{{ lookup('ansible.builtin.env', 'GSHEET_SHEET') | default('Support Case Tracker', true) }}"
 google_sheet_id: "{{ lookup('ansible.builtin.env', 'GOOGLE_SHEET_ID') }}"

@@ -15,10 +15,10 @@ sequenceDiagram
   SSO-->>Playbook: Bearer token
 
   Playbook->>Sheet: "gsheet_tracker state=read (once)"
-  Sheet-->>Playbook: existing_rows, other_rows, accounts map of last_seen_timestamp
+  Sheet-->>Playbook: existing_rows, other_rows, accounts map
   loop per account
-    Playbook->>GQL: "query RedHatSupportCase where: account in [...], lastModified > last_seen, status != Closed"
-    GQL-->>Playbook: Only recently modified, non-closed cases
+    Playbook->>GQL: "query RedHatSupportCase where: account in [...], status != Closed"
+    GQL-->>Playbook: Every currently open case for the account
     Playbook->>Playbook: "gsheet_tracker state=diff (no API call)"
   end
   Playbook->>Sheet: "gsheet_tracker state=write (once)"
@@ -33,17 +33,17 @@ sequenceDiagram
    `playbooks/pb_track_support_cases.yml`.
 2. **Read previous state once for every account** — `zjleblanc.rh_case_mgmt.gsheet_tracker` with
    `state: read` is called a single time (before the per-account loop, not inside it) and returns
-   each account's `last_seen_timestamp`/`total_previous` plus `other_rows` (raw rows for accounts
-   outside this run, preserved verbatim) and `existing_rows` (the full matrix, for the per-account
-   diff step). A `tracker_last_run_date` extra var can override the cutoff; otherwise
-   `activity_date` is the final fallback.
+   each account's previous rows (`total_previous`, `last_seen_timestamp` as a stamp only) plus
+   `other_rows` (raw rows for accounts outside this run, preserved verbatim) and `existing_rows`
+   (the full matrix, for the per-account diff step).
 3. **GraphQL fetch (per account)** — `zjleblanc.rh_case_mgmt.graphql_cases` with
    `include_description: false` and `status_filter: tracker_status_filter` (default
-   `{ne: "Closed"}`) fetches only non-closed cases modified since the cutoff
-   (see [tasks/account_track.yml](../../tasks/account_track.yml)), reducing payload size and
-   ensuring closed cases fall out of the "active" set the diff compares against.
+   `{ne: "Closed"}`) fetches every currently non-closed case for the account
+   (see [tasks/account_track.yml](../../tasks/account_track.yml)). That full open-case snapshot is
+   what the sheet stores and what the next run diffs against, so unchanged open cases stay on the
+   tab and are not reclassified as new.
 4. **Diff (per account, no API calls)** — `zjleblanc.rh_case_mgmt.gsheet_tracker` with `state: diff`
-   compares current cases against the relevant slice of `existing_rows`, returns
+   compares the full current open set against the relevant slice of `existing_rows`, returns
    new/closed/updated case lists, and builds that account's replacement rows (accumulated into a
    playbook-level fact).
 5. **Write once** — after every account has been processed, `state: write` writes `other_rows` +

@@ -9,13 +9,13 @@ credential setup shared by both workflows.
 **own job template** on a cadence (cron, AAP schedule, etc.). Each run:
 
 1. Reads the tracker sheet **once, for every tracked account at the same time** (via
-   `zjleblanc.rh_case_mgmt.gsheet_tracker state=read`) to retrieve each account's `last_seen_timestamp`
-   from the previous run, plus the raw rows belonging to any account *not* in this run
-   (`other_rows`).
-2. Per account, queries only non-closed cases modified **since that account's previous run**
-   through the GraphQL API (`status_filter`, default `{ne: "Closed"}`, excludes closed cases
-   server-side) — avoids re-fetching the entire case history on every cadence tick.
-3. Diffs the current cases against what was recorded on the previous run (new / closed / changed
+   `zjleblanc.rh_case_mgmt.gsheet_tracker state=read`) to retrieve the previous run's rows for
+   each account, plus the raw rows belonging to any account *not* in this run (`other_rows`).
+2. Per account, queries **every currently non-closed case** through the GraphQL API
+   (`status_filter`, default `{ne: "Closed"}`, excludes closed cases server-side). Closed case
+   history is not fetched; the sheet stores a full open-case snapshot so the next run can
+   classify new / closed / updated correctly.
+3. Diffs that full open set against what was recorded on the previous run (new / closed / changed
    severity, status, or owner) via `zjleblanc.rh_case_mgmt.gsheet_tracker state=diff` — a pure local
    computation with **no Google API calls** — and accumulates that account's replacement rows.
 4. After every account has been processed, writes the whole tab **exactly once**
@@ -30,9 +30,6 @@ credential setup shared by both workflows.
    `tracker_notifications` pairing. Each pairing scopes the body to `accounts: all` or a named
    subset of the pulled accounts. A pairing is sent only when its scoped accounts have changes,
    unless `tracker_notify_on_no_changes: true`.
-
-The date cutoff is resolved in order: `tracker_last_run_date` (manual override via `-e`) → sheet
-`last_seen_timestamp` → `activity_date` fallback.
 
 No matter how many accounts are tracked, each run makes exactly **one** read and **one** write
 against the Google Sheets API (plus one small `batchUpdate` for table maintenance) — not one
@@ -140,17 +137,6 @@ ansible-navigator run playbooks/pb_track_support_cases.yml \
   -e tracker_notify_on_no_changes=true
 ```
 
-## Override the last-run date cutoff
-
-Force the tracker to re-fetch all cases modified since a specific date, ignoring the sheet's
-stored `last_seen` timestamp:
-
-```bash
-ansible-navigator run playbooks/pb_track_support_cases.yml \
-  -e @vault.yml -e @my_accounts.yml \
-  -e tracker_last_run_date="2026-01-01T00:00:00Z"
-```
-
 ## What gets written to the sheet
 
 Each run rewrites the entire tracker tab exactly once, with columns:
@@ -159,7 +145,8 @@ Each run rewrites the entire tracker tab exactly once, with columns:
 
 Rows for accounts not in this run's `support_case_accounts` list are carried through verbatim
 (including any `HYPERLINK` formulas in the Case ID column); rows for every tracked account are
-replaced with that account's freshly-diffed rows.
+replaced with that account's full open-case snapshot. `Last Seen` is a run stamp on those rows; it
+is not used as a GraphQL fetch cutoff.
 
 ## What the module returns, by state
 
@@ -170,8 +157,8 @@ has three states, called in this order once per run:
 - **`state: read`** (once, before the account loop) — returns `existing_rows` (the full raw
   matrix, passed into every `diff` call), `other_rows` (untouched accounts' rows, passed into
   the final `write` call), and `accounts` — a dict keyed by account name with
-  `last_seen_timestamp` / `total_previous` for each — without writing anything. This powers the
-  incremental GraphQL fetch described above.
+  `last_seen_timestamp` / `total_previous` for each — without writing anything. The previous rows
+  are the baseline the per-account diff compares against.
 - **`state: diff`** (once per account, no API calls) — returns `new_cases`, `closed_cases`,
   `updated_cases` (with before/after values for severity, status, and owner), `total_current` /
   `total_previous` counts, and `rows` (that account's freshly-built replacement rows to

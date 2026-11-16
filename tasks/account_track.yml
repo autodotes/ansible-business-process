@@ -5,18 +5,7 @@
   ansible.builtin.set_fact:
     support_case_account_name: "{{ account.name }}"
     support_case_account_ids: "{{ account.ids }}"
-    activity_date: "{{ account.activity_date | default(activity_date) }}"
   tags: [always]
-
-- name: Determine effective last-modified cutoff | {{ account.name }}
-  vars:
-    _sheet_ts: "{{ r_tracker_read.accounts[support_case_account_name].last_seen_timestamp | default('', true) }}"
-    _override: "{{ tracker_last_run_date | default('', true) }}"
-    _fallback: "{{ activity_date }}T00:00:00Z"
-  ansible.builtin.set_fact:
-    _effective_last_modified_since: >-
-      {{ _override if (_override | length > 0) else (_sheet_ts if (_sheet_ts | length > 0) else _fallback) }}
-  tags: [always, fetch]
 
 - name: Fetch support cases via GraphQL | {{ account.name }}
   zjleblanc.rh_case_mgmt.graphql_cases:
@@ -25,7 +14,6 @@
     client_name: "{{ redhat_graphql_client_name }}"
     client_version: "{{ redhat_graphql_client_version }}"
     account_numbers: "{{ support_case_account_ids }}"
-    last_modified_since: "{{ _effective_last_modified_since | trim }}"
     status_filter: "{{ tracker_status_filter }}"
     include_description: false
     page_size: "{{ redhat_graphql_page_size }}"
@@ -33,19 +21,14 @@
   register: r_support_cases
   tags: [always, fetch]
 
-- name: Set all_cases from GraphQL response | {{ account.name }}
-  ansible.builtin.set_fact:
-    all_cases: "{{ r_support_cases.cases | default([], true) }}"
-  tags: [always, fetch]
-
-- name: Note when no cases match filters | {{ account.name }}
-  when: all_cases | length == 0
+- name: Note when no open cases are returned | {{ account.name }}
+  when: (r_support_cases.cases | default([], true) | length) == 0
   ansible.builtin.debug:
     msg: >-
-      No support cases with activity since {{ _effective_last_modified_since | trim }}
-      for {{ support_case_account_name }} (closed cases are excluded server-side via
-      tracker_status_filter). The tracker will record zero active cases, which may surface
-      prior cases as "closed".
+      No open support cases for {{ support_case_account_name }}
+      (closed cases are excluded server-side via tracker_status_filter).
+      The tracker will record zero active cases, so prior sheet rows for this
+      account will surface as closed.
   tags: [always, filter]
 
 - name: Normalize cases for the tracker | {{ account.name }}
@@ -54,7 +37,12 @@
       [].{case_id: caseNumber, summary: summary, product: product, severity: severity,
       status: status, owner: owner, created: createdDate, last_modified: lastModifiedDate}
   ansible.builtin.set_fact:
-    tracked_cases: "{{ all_cases | json_query(tracker_case_projection) | default([], true) }}"
+    tracked_cases: >-
+      {{
+        r_support_cases.cases | default([], true)
+        | json_query(tracker_case_projection)
+        | default([], true)
+      }}
   tags: [always]
 
 - name: Compute diff against previous state (no sheet write yet) | {{ account.name }}
