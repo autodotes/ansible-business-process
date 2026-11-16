@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-11-16 — Show last-modified age on tracker email case tables
+
+### Added
+- Tracker notification email New / Closed / Updated tables now end with a 🕒
+  column showing relative last-modified age (days, then weeks after 30 days,
+  then months after 90 days).
+- `zjleblanc.rh_case_mgmt.modified_ago` filter formats ISO-8601 or Google Sheets
+  serial timestamps for that column; unit tests live under the collection
+  `tests/` tree.
+- `gsheet_tracker` `updated_cases` entries now include `last_modified` so the
+  Updated table can render the same age as New and Closed.
+
 ## 2026-11-16 — Fix support tracker new/updated/closed classification
 
 ### Fixed

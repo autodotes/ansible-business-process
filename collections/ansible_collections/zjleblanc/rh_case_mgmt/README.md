@@ -25,6 +25,12 @@ support-analyzer and support-tracker workflows (see
   computation that returns new/closed/updated cases; `write` performs the single clear+rewrite and
   optionally maintains a Sheets API "Table" object over the tab.
 
+## Filters
+
+- `modified_ago` -- Format a last-modified timestamp (ISO-8601 or Google Sheets serial) as a
+  relative English age (`N days ago`, then weeks after 30 days, then months after 90 days). Used by
+  the support case tracker email.
+
 ### Note on the separate `zjleblanc.gsuite.gsheet_update`
 
 This collection's `gsheet_update` is intentionally distinct from

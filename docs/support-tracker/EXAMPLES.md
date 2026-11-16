@@ -165,6 +165,8 @@ has three states, called in this order once per run:
   accumulate). These drive the per-account debug summary and are filtered into
   `notification_results` for each email pairing
   ([templates/support_case_tracking_email.html.j2](../../templates/support_case_tracking_email.html.j2)).
+  Each New / Closed / Updated case table in that email ends with a 🕒 column showing how long
+  ago the case was last modified (days, then weeks after 30 days, then months after 90 days).
 - **`state: write`** (once, after the account loop) — takes the fully assembled `rows` (every
   account's accumulated rows, concatenated with `other_rows`) and performs the single
   clear+rewrite, plus best-effort Table maintenance (`table_name`).

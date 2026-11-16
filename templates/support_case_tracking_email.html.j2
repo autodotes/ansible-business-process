@@ -59,6 +59,7 @@
         <th style="padding:6px; border-bottom:1px solid #ddd;">Product</th>
         <th style="padding:6px; border-bottom:1px solid #ddd;">Severity</th>
         <th style="padding:6px; border-bottom:1px solid #ddd;">Status</th>
+        <th style="padding:6px; border-bottom:1px solid #ddd;" title="Last modified" aria-label="Last modified">🕒</th>
       </tr>
       {% for case in result.new_cases %}
       <tr>
@@ -67,6 +68,7 @@
         <td style="padding:6px; border-bottom:1px solid #eee;">{{ case.product }}</td>
         <td style="padding:6px; border-bottom:1px solid #eee;">{{ case.severity }}</td>
         <td style="padding:6px; border-bottom:1px solid #eee;">{{ case.status }}</td>
+        <td style="padding:6px; border-bottom:1px solid #eee;">{{ case.last_modified | zjleblanc.rh_case_mgmt.modified_ago }}</td>
       </tr>
       {% endfor %}
     </table>
@@ -81,6 +83,7 @@
         <th style="padding:6px; border-bottom:1px solid #ddd;">Product</th>
         <th style="padding:6px; border-bottom:1px solid #ddd;">Severity</th>
         <th style="padding:6px; border-bottom:1px solid #ddd;">Last Status</th>
+        <th style="padding:6px; border-bottom:1px solid #ddd;" title="Last modified" aria-label="Last modified">🕒</th>
       </tr>
       {% for case in result.closed_cases %}
       <tr>
@@ -89,6 +92,7 @@
         <td style="padding:6px; border-bottom:1px solid #eee;">{{ case.product }}</td>
         <td style="padding:6px; border-bottom:1px solid #eee;">{{ case.severity }}</td>
         <td style="padding:6px; border-bottom:1px solid #eee;">{{ case.status }}</td>
+        <td style="padding:6px; border-bottom:1px solid #eee;">{{ case.last_modified | zjleblanc.rh_case_mgmt.modified_ago }}</td>
       </tr>
       {% endfor %}
     </table>
@@ -101,6 +105,7 @@
         <th style="padding:6px; border-bottom:1px solid #ddd;">Case</th>
         <th style="padding:6px; border-bottom:1px solid #ddd;">Summary</th>
         <th style="padding:6px; border-bottom:1px solid #ddd;">Changes</th>
+        <th style="padding:6px; border-bottom:1px solid #ddd;" title="Last modified" aria-label="Last modified">🕒</th>
       </tr>
       {% for case in result.updated_cases %}
       <tr>
@@ -111,6 +116,7 @@
           <div>{{ field | capitalize }}: {{ change.old | default('(none)', true) }} &rarr; {{ change.new | default('(none)', true) }}</div>
           {% endfor %}
         </td>
+        <td style="padding:6px; border-bottom:1px solid #eee;">{{ case.last_modified | zjleblanc.rh_case_mgmt.modified_ago }}</td>
       </tr>
       {% endfor %}
     </table>

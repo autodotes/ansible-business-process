@@ -218,8 +218,9 @@ closed_cases:
 updated_cases:
     description: >-
         Cases present on both runs whose severity, status, or owner changed. Each entry includes
-        the case identity fields (C(case_id), C(case_url), C(summary), C(product)) plus a
-        C(changes) dict of C(field) -> C({old, new}). Returned by C(state=diff).
+        the case identity fields (C(case_id), C(case_url), C(summary), C(product),
+        C(last_modified)) plus a C(changes) dict of C(field) -> C({old, new}). Returned by
+        C(state=diff).
     type: list
     elements: dict
     returned: state=diff
@@ -229,6 +230,9 @@ updated_cases:
             type: str
         case_url:
             description: Full URL to the case on the Red Hat support portal.
+            type: str
+        last_modified:
+            description: Last-modified timestamp from the current case snapshot.
             type: str
 total_current:
     description: Number of cases passed in via O(cases). Returned by C(state=diff).
@@ -491,6 +495,7 @@ def diff_cases(previous_by_id, current_by_id):
                     "case_url": CASE_URL_BASE + cid,
                     "summary": current_case.get("summary", ""),
                     "product": current_case.get("product", ""),
+                    "last_modified": current_case.get("last_modified", "") or "",
                     "changes": changes,
                 }
             )
